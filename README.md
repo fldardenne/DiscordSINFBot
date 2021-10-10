@@ -1,10 +1,11 @@
 # DiscordSINFBot
 
 # How to install ?
-Clone the project and install the dependencies in the `src` folder.
+Clone the project and install the dependencies in the `src` folder by running
 ``` npm install```
 
 Create the `src/.env` folder, put it the content of `.env.example` by modifying the variables appropriately.
+To create a bot and get the token, go to https://discord.com/developers/applications . 
 
 To "upload" the commands to the Discord helper, run
 ```node deploy-commands.js```
@@ -23,3 +24,4 @@ To run the bot, execute
 - [ ] A poll system
 - [ ] Some funny commands (!poop, !méchant, !criminel,...)
 - [ ] A dynamic !help listing
+- [x] A !version command that return the commit hash on which the bot run
