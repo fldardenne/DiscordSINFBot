@@ -15,4 +15,4 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           port: ${{ secrets.DEPLOY_PORT }}
           key: ${{ secrets.DEPLOY_KEY }}
-          script: cd ${{ secrets.DEPLOY_TARGET }} && git pull && docker build -t sinfbot .
+          script: cd ${{ secrets.DEPLOY_TARGET }} && ./deploy.sh
