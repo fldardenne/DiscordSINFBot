@@ -1,7 +1,7 @@
 FROM node
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/src
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -13,7 +13,8 @@ RUN npm install
 # RUN npm ci --only=production
 
 # Bundle app source
-COPY ./src .
+
+COPY . ..
 
 RUN node deploy-commands.js
 CMD [ "node", "bot.js" ]
