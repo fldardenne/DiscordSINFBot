@@ -1,19 +1,18 @@
 name: SSH Deploy
 
-on:
-  push:
-    branches: [ main ]
+on: [push]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/test'
+    runs-on: [ubuntu-latest]
     steps:
-      - name: ssh deploy
-        uses: easingthemes/ssh-deploy@v2.1.4
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
-          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
-          REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
-          TARGET: ${{ secrets.DEPLOY_TARGET }}
+      - uses: actions/checkout@v1
+      - name: Push to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: cd ${{ secrets.DEPLOY_TARGET }} && git pull && docker build -t sinfbot .
