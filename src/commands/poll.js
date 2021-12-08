@@ -29,7 +29,7 @@ module.exports = {
 			return interaction.reply({ content: "A poll may not have a single possible answer" });
 		}
 
-		if (answers?.length > 10) {
+		if (answers?.length > answer_emojis.length) {
 			return interaction.reply({ content: `You may not have more than ${answer_emojis.length} possible answers (you passed ${answers.length})`, ephemeral: true });
 		}
 
