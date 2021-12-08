@@ -26,7 +26,7 @@ module.exports = {
 		const answer_emojis = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
 
 		if (answers?.length == 1) {
-			return interaction.reply({ content: "A poll may not have a single possible answer" });
+			return interaction.reply({ content: "A poll may not have a single possible answer", ephemeral: true });
 		}
 
 		if (answers?.length > answer_emojis.length) {
