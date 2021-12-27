@@ -6,9 +6,9 @@ module.exports = {
 		.setName('elo')
 		.setDescription('Get elo with the user specified on chess.com')
 		.addStringOption(option => option.setName('username').setDescription('Username of the user on chess.com')),
-        
+
 	async execute(interaction) {
-		const username = interaction.options.getString('username');
+		const username = interaction.options.getString('username').toLowerCase();
 
         const options = {
             hostname: 'api.chess.com',
@@ -16,7 +16,7 @@ module.exports = {
             method: 'GET'
         };
 
-        const getRating = (categoryInformation) => categoryInformation["last"]["rating"]; 
+        const getRating = (categoryInformation) => categoryInformation !== undefined ? `est ${categoryInformation["last"]["rating"]}` : "n'est pas classé"; 
 
         const req = https.request(options, res => {
             
@@ -29,8 +29,7 @@ module.exports = {
                 res.on('end', () => {
                     const player = JSON.parse(data);
                     const { chess_bullet, chess_blitz, chess_rapid } = player;
-
-                    return interaction.reply(`${username} est ${getRating(chess_bullet)} en bullet, ${getRating(chess_blitz)} en blitz et ${getRating(chess_rapid)} en rapide`);
+                    return interaction.reply(`${username} ${getRating(chess_bullet)} en bullet, ${getRating(chess_blitz)} en blitz et ${getRating(chess_rapid)} en rapide`);
                 });
             }
 
