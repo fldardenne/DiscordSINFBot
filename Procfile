@@ -1,1 +1,1 @@
-worker: cd src && node bot.js
+worker: cd src && node deploy-commands.js && node bot.js
