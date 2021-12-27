@@ -36,7 +36,7 @@ module.exports = {
                     const { chess_bullet, chess_blitz, chess_rapid } = player;
                     const embed = new MessageEmbed()
                                 .setTitle('elo')
-                                .setDescription(interaction.user.username)
+                                .setDescription(username)
                                 .setAuthor(interaction.user.username)
                                 .setColor('#0099ff')
                                 .setThumbnail("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png")
