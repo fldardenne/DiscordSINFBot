@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require("discord.js");
+
 const https = require('https');
 
 module.exports = {
@@ -8,15 +10,18 @@ module.exports = {
 		.addStringOption(option => option.setName('username').setDescription('Username of the user on chess.com')),
 
 	async execute(interaction) {
-		const username = interaction.options.getString('username').toLowerCase();
-
+		const username = interaction.options.getString('username')
+        if (!username) {
+            return interaction.reply({ content: "You must provide a username !", ephemeral: true });
+        }
+        username.toLowerCase();
         const options = {
             hostname: 'api.chess.com',
             path: `/pub/player/${username}/stats`,
             method: 'GET'
         };
 
-        const getRating = (categoryInformation) => categoryInformation !== undefined ? `est ${categoryInformation["last"]["rating"]}` : "n'est pas classé"; 
+        const getRating = (categoryInformation) => categoryInformation !== undefined ? `${categoryInformation["last"]["rating"]}` : "pas classé"; 
 
         const req = https.request(options, res => {
             
@@ -29,21 +34,54 @@ module.exports = {
                 res.on('end', () => {
                     const player = JSON.parse(data);
                     const { chess_bullet, chess_blitz, chess_rapid } = player;
-                    return interaction.reply(`${username} ${getRating(chess_bullet)} en bullet, ${getRating(chess_blitz)} en blitz et ${getRating(chess_rapid)} en rapide`);
+                    const embed = new MessageEmbed()
+                                .setTitle('elo')
+                                .setDescription(interaction.user.username)
+                                .setAuthor(interaction.user.username)
+                                .setColor('#0099ff')
+                                .setThumbnail("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png")
+                                .addFields(
+                                    {name: 'bullet' , value: getRating(chess_bullet).toString(), inline: true},
+                                    {name: 'blitz' ,  value: getRating(chess_blitz).toString(),  inline: true},
+                                    {name: 'rapide' , value: getRating(chess_rapid).toString(), inline: true},
+                                    );
+                     interaction.reply({ embeds: [embed] });
+                    const message =  interaction.fetchReply();
                 });
             }
 
             else if (res.statusCode === 404) {
-                return interaction.reply(`${username} pas trouvé sur chess.com`);
+                    const embed = new MessageEmbed()
+                                    .setTitle('ERREUR')
+                                    .setDescription(`${username} pas trouvé sur chess.com`)
+                                    .setAuthor(interaction.user.username)
+                                    .setColor('#FF1919')
+                                    .setThumbnail("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png");
+                     interaction.reply({ embeds: [embed] });
+                    const message =  interaction.fetchReply();
             }
 
             else {
-                return interaction.reply(`Erreur lors de la recherche des ratings`);
+                 const embed = new MessageEmbed()
+                                    .setTitle('ERREUR')
+                                    .setDescription(`Erreur lors de la recherche des ratings`)
+                                    .setAuthor(interaction.user.username)
+                                    .setColor('#FF1919')
+                                    .setThumbnail("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png");
+                     interaction.reply({ embeds: [embed] });
+                    const message =  interaction.fetchReply();
             }
         });
 
         req.on('error', error => {
-            return interaction.reply("Il y a eu une erreur lors de la recherche.");
+            const embed = new MessageEmbed()
+                                    .setTitle('ERREUR')
+                                    .setDescription(`Il y a eu une erreur lors de la recherche.`)
+                                    .setAuthor(interaction.user.username)
+                                    .setColor('#FF1919')
+                                    .setThumbnail("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png");
+                     interaction.reply({ embeds: [embed] });
+                    const message =  interaction.fetchReply();
         });
 
         req.end();
