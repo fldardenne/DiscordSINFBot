@@ -10,7 +10,6 @@ const communoteAuthor = {
     iconUrl: "https://www.communote.be/build/images/favicon-32.71a81cd6.png",
     url: "https://www.communote.be"
 };
-const browsePath = communoteAuthor.url + "/browse";
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -66,13 +65,13 @@ module.exports = {
                         
                         const notes = data["hydra:member"];
                         if(notes.length > 0) {
-                            const path = notes[0].path;
-                            // let url = browsePath + path.substring(path.indexOf("/")).replaceAll("-", " ");
+                            const path = notes[0].course.path;
+                            let url = communoteAuthor.url + path.substring(path.indexOf("/")).replaceAll(" ", "%20");
                             embed
                                 .setTitle(`Available notes for ${code}`)
                                 .setThumbnail(yesPath)
                                 .setColor("GREEN")
-                                // .setURL(url); Discord doesn't want this because there are spaces in the url. Moreover the path given by the API isn't enough to build a correct url. I do need to modify Communote's API.
+                                .setURL(url);
 
                             notes.forEach(note => {
                                 embed.addField(`${note.title} ${note.averageScore != 0 ? "("+note.averageScore+")" : ""}`, note.shortDescription, true)
