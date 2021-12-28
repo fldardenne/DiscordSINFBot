@@ -5,7 +5,7 @@ module.exports = {
 		.setName('méchant')
 		.setDescription('Méchant...'),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
         return interaction.reply("https://cdn.discordapp.com/attachments/654964496959406143/797178131400097863/AT-cm_997620632.mp4");
 	},
 };

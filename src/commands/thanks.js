@@ -5,9 +5,9 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('thanks')
 		.setDescription('Return the list of my contributor'),
-	async execute(interaction) {
+	async execute(client, interaction) {
         contributor = require('child_process')
-        .execSync("git log --pretty='%cn' | sort | uniq | sed '/GitHub/d'")
+        .execSync("git shortlog -sne | awk '!_[$NF]++' | awk '{$1=$NF=""}1' | awk '{$1=$1}1''") 
         .toString().trim()
 
         const embed = new MessageEmbed()

@@ -5,7 +5,7 @@ module.exports = {
 		.setName('motivation')
 		.setDescription('Donne de la motivation, ou pas...'),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
         const random = Math.floor(Math.random() * 20);
         let videoLink = "";
         
