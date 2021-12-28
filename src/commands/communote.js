@@ -18,6 +18,8 @@ module.exports = {
         .addStringOption(option => option.setName("code").setDescription("The code of the course"))
         ,
 
+
+
     async execute(client, interaction) {
         const code = interaction.options.getString("code");
         const name = interaction.options.getString("name");
