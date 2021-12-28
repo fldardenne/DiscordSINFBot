@@ -10,8 +10,6 @@ module.exports = {
         .execSync("git shortlog -sne HEAD | awk '!_[$NF]++' | awk '{$1=$NF=\"\"}1' | awk '{$1=$1}1'")
         .toString()
 
-        console.log(contributor)
-
         const embed = new MessageEmbed()
                                 .setTitle('Thanks')
                                 .setDescription(contributor)
