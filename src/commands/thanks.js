@@ -4,11 +4,11 @@ const { MessageEmbed } = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('thanks')
-		.setDescription('Return the list of my contributor'),
-	async execute(interaction) {
+		.setDescription('Return the list of my contributors'),
+	async execute(client, interaction) {
         contributor = require('child_process')
-        .execSync("git log --pretty='%cn' | sort | uniq | sed '/GitHub/d'")
-        .toString().trim()
+        .execSync("git shortlog -sne HEAD | awk '!_[$NF]++' | awk '{$1=$NF=\"\"}1' | awk '{$1=$1}1'")
+        .toString()
 
         const embed = new MessageEmbed()
                                 .setTitle('Thanks')
