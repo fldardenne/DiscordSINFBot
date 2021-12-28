@@ -24,7 +24,7 @@ module.exports = {
 
         if (!code) {
             return interaction.reply({
-                content: "You shoul provide an argument",
+                content: "You should provide an argument",
                 ephemeral: true
             })
         }
