@@ -5,10 +5,10 @@ const https = require('https');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('pokémon')
-		.setDescription('Retourne l\'image du pokémon avec l\'id donnée')
-        .addIntegerOption(option => option.setName('id').setDescription("Id du pokémon")),
+		.setDescription('Returns the image of the pokemon')
+        .addIntegerOption(option => option.setName('id').setDescription("pokemon id")),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
         const id = interaction.options.getInteger('id');
 
         const options = {
@@ -34,16 +34,16 @@ module.exports = {
             }
 
             else if (res.statusCode === 404) {
-                return interaction.reply(`${id} pas trouvé!`);
+                return interaction.reply(`${id} not found!`);
             }
 
             else {
-                return interaction.reply(`Erreur lors de la recherche du pokémon`);
+                return interaction.reply(`Error while trying to search for pokemon`);
             }
         });
 
         req.on('error', error => {
-            return interaction.reply("Il y a eu une erreur lors de la recherche.");
+            return interaction.reply("Error while trying to search for pokemon");
         });
 
         req.end();
