@@ -5,7 +5,7 @@ module.exports = {
 		.setName('criminel')
 		.setDescription('Criminel!'),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
         return interaction.reply("https://media.discordapp.net/attachments/636295672861032448/890574900346097684/unknown.png");
 	},
 };

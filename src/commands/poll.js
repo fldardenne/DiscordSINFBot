@@ -16,7 +16,7 @@ module.exports = {
 			.setName("answers")
 			.setDescription("Possible poll answers")),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
 		const question = interaction.options.getString("question");
 		const answers = interaction.options.getString("answers")?.split(' ').map(x => x.replaceAll('_', ' '));
 

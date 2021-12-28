@@ -12,7 +12,7 @@ module.exports = {
             .setDescription('Username of the user on chess.com')
             .setRequired(true)),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
 		let username = interaction.options.getString('username')
         username = username.toLowerCase();
         

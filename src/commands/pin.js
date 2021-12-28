@@ -9,11 +9,9 @@ module.exports = {
 			.setDescription("ID of the message you want to pin")
 			.setRequired(true)),
 
-	async execute(interaction) {
+	async execute(client, interaction) {
 		const id = interaction.options.getString("id");
 
-		if (!id) {
-			return interaction.reply({ content: "You must provide a message ID", ephemeral: true });
-		}
+		console.log(interaction)
 	}
 }

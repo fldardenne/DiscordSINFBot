@@ -9,9 +9,9 @@ module.exports = {
 			.setName('amount')
 			.setDescription('Number of messages to prune')
 			.setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		const amount = interaction.options.getInteger('amount');
-        console.log(interaction)
+		
         if(!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)){
             return interaction.reply({ content: "You don't have the permission to do that.", ephemeral: true });
         }
