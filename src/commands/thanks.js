@@ -4,7 +4,6 @@ const { MessageEmbed } = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('thanks')
-
 		.setDescription('Return the list of my contributors'),
 	async execute(client, interaction) {
         contributor = require('child_process')
