@@ -7,7 +7,7 @@ module.exports = {
 		.setDescription('Return the list of my contributor'),
 	async execute(interaction) {
         contributor = require('child_process')
-        .execSync("git shortlog -s | cut -c8- | sed '/fdardenne/d'") //sed is optionnal, is used because this user appears twice for some reason
+        .execSync("git shortlog -sne | awk '!_[$NF]++' | awk '{$1=$NF=""}1' | awk '{$1=$1}1''") 
         .toString().trim()
 
         const embed = new MessageEmbed()
