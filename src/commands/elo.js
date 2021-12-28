@@ -7,14 +7,15 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('elo')
 		.setDescription('Get elo with the user specified on chess.com')
-		.addStringOption(option => option.setName('username').setDescription('Username of the user on chess.com')),
+		.addStringOption(option => option
+            .setName('username')
+            .setDescription('Username of the user on chess.com')
+            .setRequired(true)),
 
 	async execute(interaction) {
-		const username = interaction.options.getString('username')
-        if (!username) {
-            return interaction.reply({ content: "You must provide a username !", ephemeral: true });
-        }
-        username.toLowerCase();
+		let username = interaction.options.getString('username')
+        username = username.toLowerCase();
+        
         const options = {
             hostname: 'api.chess.com',
             path: `/pub/player/${username}/stats`,

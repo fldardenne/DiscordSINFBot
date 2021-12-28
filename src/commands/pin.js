@@ -6,7 +6,8 @@ module.exports = {
 		.setDescription("Allows non-administrators to pin messages")
 		.addStringOption(option => option
 			.setName("id")
-			.setDescription("ID of the message you want to pin")),
+			.setDescription("ID of the message you want to pin")
+			.setRequired(true)),
 
 	async execute(interaction) {
 		const id = interaction.options.getString("id");

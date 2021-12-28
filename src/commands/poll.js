@@ -7,7 +7,8 @@ module.exports = {
 		.setDescription("Creates a poll")
 		.addStringOption(option => option
 			.setName("question")
-			.setDescription("Poll question"))
+			.setDescription("Poll question")
+			.setRequired(true))
 
 		// unfortunately, Discord slash commands don't yet support variadic arguments: https://github.com/discord/discord-api-docs/issues/2331
 
