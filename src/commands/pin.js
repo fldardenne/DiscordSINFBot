@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 
 const ROLE_NAME = "Pineur";
 // const VOTE_SECONDS = 5 * 60; // 5 min
-const VOTE_SECONDS = 2; // 5 min
+const VOTE_SECONDS = 3; // 5 min
 const VOTE_THRESHOLD = 5;
 
 const IN_FAVOUR_REACTION = "✅";
@@ -39,51 +39,77 @@ module.exports = {
 
 		// otherwise, setup a vote
 
-		message.react(IN_FAVOUR_REACTION);
-		message.react(AGAINST_REACTION);
+		// message.react(IN_FAVOUR_REACTION);
+		// message.react(AGAINST_REACTION);
 
-		const filter = (reaction, _) => {
-			return reaction.emoji.name in [IN_FAVOUR_REACTION, AGAINST_REACTION];
+		const filter = (reaction, user) => {
+			return reaction.emoji.name === '👍' && user.id === message.author.id;
 		};
+		
+		const collector = message.createReactionCollector({ filter, time: 15000 });
+		
+		collector.on('collect', (reaction, user) => {
+			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+		});
+		
+		collector.on('end', collected => {
+			console.log(`Collected ${collected.size} items`);
+		});
+		
 
-		message.awaitReactions({ filter, max: 1, time: 1000 * VOTE_SECONDS })
+		// const filter = (reaction, _) => {
+		// 	return true;//[IN_FAVOUR_REACTION, AGAINST_REACTION].includes(reaction.emoji.name);
+		// };
 
-		setTimeout(() => {
-			// refresh the cache
-			
-			message.react(IN_FAVOUR_REACTION);
-			message.react(AGAINST_REACTION);
+		// const collector = message.createReactionCollector(filter, { time: 1000 * VOTE_SECONDS });
 
-			const in_favour = message.reactions.cache.get(IN_FAVOUR_REACTION)?.count;
-			const against = message.reactions.cache.get(AGAINST_REACTION)?.count;
+		// let in_favour = 0;
+		// let against = 0;
 
-			console.log(in_favour, against);
+		// collector.on("collect", (reaction, _) => {
+		// 	console.log(reaction.count, reaction.emoji.name)
 
-			if (!in_favour || !against) {
-				console.log("[pin vote] someone removed one or more of the reactions");
-				return;
-			}
+		// 	in_favour += reaction.count * (reaction.emoji.name === IN_FAVOUR_REACTION);
+		// 	against += reaction.count * (reaction.emoji.name === AGAINST_REACTION);
+		// });
 
-			// account for the bot's reaction
+		// collector.on("end", collected => {
+		// 	console.log(collected.size, in_favour, against)
+		// });
 
-			in_favour--;
-			against--;
+		// interaction.reply({ content: "Insufficient privileges to pin this message. We will now proceed to a vote! After 5 minutes, if there are at least 5 votes in favour of this pin and there are more people in favour than against it, your message will be pinned!", ephemeral: true })
+		// 	.then(() => {})
 
-			if (in_favour < VOTE_THRESHOLD) {
-				console.log(`[pin vote] only ${in_favour} people voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD})`);
-				return;
-			}
+		// message.awaitReactions({ filter, max: 1, time: 1000 * VOTE_SECONDS, errors: ["time"] })
+		// 	.then(collected => {
+		// 		const reaction = collected.first();
 
-			if (against >= in_favour) {
-				console.log(`[pin vote] more or the same number of people voted against the pin as in favour of the pin (${against} vs ${in_favour})`);
-				return;
-			}
+		// 		in_favour += reaction.count * (reaction.emoji.name === IN_FAVOUR_REACTION);
+		// 		against += reaction.count * (reaction.emoji.name === AGAINST_REACTION);
+		// 	})
+		// 	.catch(collected => {
+		// 		message.reply("Someone removed one or more of the reactions necessary for a pin vote!")
+		// 	});
 
-			// finally, pin the message
+		// // account for the bot's reaction
 
-			message.pin();
-		}, 1000 * VOTE_SECONDS);
+		// in_favour--;
+		// against--;
 
-		return interaction.reply({ content: "Insufficient privileges to pin this message. We will now proceed to a vote! After 5 minutes, if there are at least 5 votes in favour of this pin and there are more people in favour than against it, your message will be pinned!", ephemeral: true });
+		// if (in_favour < VOTE_THRESHOLD) {
+		// 	console.log(`[pin vote] only ${in_favour} people voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD})`);
+		// 	return;
+		// }
+
+		// if (against >= in_favour) {
+		// 	console.log(`[pin vote] more or the same number of people voted against the pin as in favour of the pin (${against} vs ${in_favour})`);
+		// 	return;
+		// }
+
+		// // finally, pin the message
+
+		// message.pin();
+
+		// return null;
 	}
 }
