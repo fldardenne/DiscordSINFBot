@@ -20,6 +20,6 @@ To run the bot, execute
 - [x] A pin system for members with the role of pin management. (`/pin <message ID to pin>`) 
 - [x] A welcoming DM to newcomers
 - [x] A poll system
-- [ ] Some funny commands (`/poop`, `/méchant`, `/criminel`,...)
+- [x] Some funny commands (`/poop`, `/méchant`, `/criminel`,...)
 - [ ] A dynamic `/help` listing
 - [x] A `/version` command that return the commit hash on which the bot run
