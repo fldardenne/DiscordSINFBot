@@ -4,7 +4,7 @@ const { MessageEmbed } = require("discord.js");
 const ROLE_NAME = "Pineur";
 const VOTE_MINUTES = 5;
 const VOTE_THRESHOLD = 5;
-const VOTE_EXCLUDE_AUTHOR = false;
+const VOTE_EXCLUDE_PINNER = false;
 
 const IN_FAVOUR_REACTION = "✅";
 const AGAINST_REACTION = "❌";
@@ -29,33 +29,28 @@ function gen_rich(content, icon, colour) {
 }
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('pin')
-    .setDescription('Allows non-administrators to pin messages')
-    .addStringOption(option =>
-      option
-        .setName('id')
-        .setDescription('ID of the message you want to pin')
-        .setRequired(true),
-    ),
+	data: new SlashCommandBuilder()
+		.setName('pin')
+		.setDescription('Allows non-administrators to pin messages')
+		.addStringOption(option => option
+			.setName('id')
+			.setDescription('ID of the message you want to pin')
+			.setRequired(true),
+    	),
 
-  async execute(client, interaction) {
-    const id = interaction.options.getString('id')
-    const channel = await client.channels.fetch(interaction.channelId)
+	async execute(client, interaction) {
+		const id = interaction.options.getString('id');
+		const channel = await client.channels.fetch(interaction.channelId);
 
-    const message = await channel.messages.fetch(id).catch(() => undefined)
+		const message = await channel.messages.fetch(id).catch(() => undefined);
 
-    if (!message) {
-      return interaction.reply({
-        content:
-          "Message could not be found! Are you sure you're passing a valid message ID?",
-        ephemeral: true,
-      })
-    }
+		if (!message) {
+		return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
+		}
 
 		// if we have the special role that allows us to pin, pin instantly
 
-    const member = interaction.member
+		const member = interaction.member;
 
 		if (member.roles.cache.some(role => role.name === ROLE_NAME)) {
 			await message.pin();
@@ -64,8 +59,13 @@ module.exports = {
 
 		// otherwise, setup a vote
 
-		message.react(IN_FAVOUR_REACTION);
-		message.react(AGAINST_REACTION);
+		let rv = interaction.reply({ content: "Insufficient privileges to pin this message!", ephemeral: true });
+
+		const rich = gen_rich(`${interaction.user.tag} has insufficient privileges to pin this message! We will now proceed to a vote! After ${VOTE_MINUTES} minutes, if there are at least ${VOTE_THRESHOLD} votes in favour of this pin and there are more people in favour than against it, your message will be pinned!`, "angry", "#ff7733");
+		let vote = await message.reply({ embeds: [rich] });
+
+		vote.react(IN_FAVOUR_REACTION);
+		vote.react(AGAINST_REACTION);
 
 		const filter = (reaction, user) => {
 			if (user.id === client.user.id) {
@@ -76,15 +76,15 @@ module.exports = {
 				return false; // reject other reactions
 			}
 
-			if (VOTE_EXCLUDE_AUTHOR && user.id === message.author.id) {
-				return false; // reject reactions from original poster if VOTE_EXCLUDE_AUTHOR is set
+			if (VOTE_EXCLUDE_PINNER && user.id === interaction.user.id) {
+				return false; // reject reactions from original poster if VOTE_EXCLUDE_PINNER is set
 			}
 
 			return true;
 		};
-		
-		const collector = message.createReactionCollector({ filter, time: VOTE_MINUTES * 60 * 1000 });
-		
+
+		const collector = vote.createReactionCollector({ filter, time: VOTE_MINUTES * 60 * 1000 });
+
 		collector.on('collect', (reaction, user) => {
 			// console.log(`${user.tag} reacted with ${reaction.emoji.name}`);
 		});
@@ -121,28 +121,25 @@ module.exports = {
 					rich = gen_rich(`Only ${in_favour} people voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be pinned.`, "uncool", "#ff7777");
 				}
 
-				message.reply({ embeds: [rich] });
+				vote.reply({ embeds: [rich] });
 				return;
 			}
 
 			if (against >= in_favour) {
 				const rich = gen_rich(`More or the same number of people voted against the pin as in favour of the pin (${against} vs ${in_favour}). Message will not be pinned.`, "waah", "#ff7777");
 
-				message.reply({ embeds: [rich] });
+				vote.reply({ embeds: [rich] });
 				return;
 			}
 
 			// finally, pin the message
 
 			const rich = gen_rich("Vote was successful! Message will now be pinned!", "salute", "#77ff77");
-			message.reply({ embeds: [rich] });
+			vote.reply({ embeds: [rich] });
 
 			message.pin();
 		});
 
-		const rich = gen_rich(`${interaction.user.tag} has insufficient privileges to pin this message! We will now proceed to a vote! After ${VOTE_MINUTES} minutes, if there are at least ${VOTE_THRESHOLD} votes in favour of this pin and there are more people in favour than against it, your message will be pinned!`, "angry", "#ff7733");
-		message.reply({ embeds: [rich] });
-
-		return interaction.reply({ content: "Insufficient privileges to pin this message!", ephemeral: true });
+		return rv;
 	}
 }
