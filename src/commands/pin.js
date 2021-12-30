@@ -82,7 +82,7 @@ module.exports = {
 
 			return true;
 		};
-
+    
 		const collector = vote.createReactionCollector({ filter, time: VOTE_MINUTES * 60 * 1000 });
 
 		// count votes
