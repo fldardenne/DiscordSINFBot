@@ -1,56 +1,65 @@
 // Require the necessary discord.js classes
-const fs = require('fs');
-const { Client, Collection, Intents } = require('discord.js');
-const dotenv = require('dotenv');
-dotenv.config();
+const fs = require('fs')
+const { Client, Collection, Intents } = require('discord.js')
+const dotenv = require('dotenv')
+dotenv.config()
 
 const client = new Client({
+<<<<<<< HEAD
 	intents: [
 		Intents.FLAGS.GUILDS,
 		Intents.FLAGS.GUILD_MEMBERS,
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 	]
 });
+=======
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS],
+})
+>>>>>>> af7c1ff8bf566687e89182a912ba0c05c2e8f9cc
 
 // register the set of commands dynamically by reading the ./commands folder
-client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+client.commands = new Collection()
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter(file => file.endsWith('.js'))
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.data.name, command);
+  const command = require(`./commands/${file}`)
+  client.commands.set(command.data.name, command)
 }
-
 
 // if there is an event and this event is a command
 client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()) return
 
-	const command = client.commands.get(interaction.commandName);
+  const command = client.commands.get(interaction.commandName)
 
-	if (!command) return;
+  if (!command) return
 
-	try {
-		console.log(command)
-		await command.execute(client, interaction);
-	} catch (error) {
-		console.error(error);
-		return interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-});
-
+  try {
+    console.log(command)
+    await command.execute(client, interaction)
+  } catch (error) {
+    console.error(error)
+    return interaction.reply({
+      content: 'There was an error while executing this command!',
+      ephemeral: true,
+    })
+  }
+})
 
 // other event
-const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+const eventFiles = fs
+  .readdirSync('./events')
+  .filter(file => file.endsWith('.js'))
 
 for (const file of eventFiles) {
-	const event = require(`./events/${file}`);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(client, ...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(client, ...args));
-	}
+  const event = require(`./events/${file}`)
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(client, ...args))
+  } else {
+    client.on(event.name, (...args) => event.execute(client, ...args))
+  }
 }
 
-
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN)

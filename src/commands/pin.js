@@ -29,28 +29,33 @@ function gen_rich(content, icon, colour) {
 }
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName("pin")
-		.setDescription("Allows non-administrators to pin messages")
-		.addStringOption(option => option
-			.setName("id")
-			.setDescription("ID of the message you want to pin")
-			.setRequired(true)),
+  data: new SlashCommandBuilder()
+    .setName('pin')
+    .setDescription('Allows non-administrators to pin messages')
+    .addStringOption(option =>
+      option
+        .setName('id')
+        .setDescription('ID of the message you want to pin')
+        .setRequired(true),
+    ),
 
-	async execute(client, interaction) {
-		const id = interaction.options.getString("id");
-		const channel = await client.channels.fetch(interaction.channelId);
+  async execute(client, interaction) {
+    const id = interaction.options.getString('id')
+    const channel = await client.channels.fetch(interaction.channelId)
 
-		const message = await channel.messages.fetch(id)
-			.catch(() => undefined);
+    const message = await channel.messages.fetch(id).catch(() => undefined)
 
-		if (!message) {
-			return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
-		}
+    if (!message) {
+      return interaction.reply({
+        content:
+          "Message could not be found! Are you sure you're passing a valid message ID?",
+        ephemeral: true,
+      })
+    }
 
 		// if we have the special role that allows us to pin, pin instantly
 
-		const member = interaction.member;
+    const member = interaction.member
 
 		if (member.roles.cache.some(role => role.name === ROLE_NAME)) {
 			await message.pin();
