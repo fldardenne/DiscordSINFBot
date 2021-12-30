@@ -4,7 +4,7 @@ const { MessageEmbed } = require("discord.js");
 const ROLE_NAME = "Pineur";
 const VOTE_MINUTES = 5;
 const VOTE_THRESHOLD = 5;
-const VOTE_EXCLUDE_PINNER = false;
+const VOTE_EXCLUDE_PINNER = true;
 
 const IN_FAVOUR_REACTION = "✅";
 const AGAINST_REACTION = "❌";
@@ -82,29 +82,25 @@ module.exports = {
 
 			return true;
 		};
-
+    
 		const collector = vote.createReactionCollector({ filter, time: VOTE_MINUTES * 60 * 1000 });
 
+		// count votes
+
+		let in_favour = 0;
+		let against = 0;
+
 		collector.on('collect', (reaction, user) => {
-			// console.log(`${user.tag} reacted with ${reaction.emoji.name}`);
+			const name = reaction.emoji.name;
+			
+			in_favour += name === IN_FAVOUR_REACTION;
+			against += name === AGAINST_REACTION;
 		});
 		
+		// once time is up, decide whether or not to pin
+
 		collector.on('end', collected => {
-			// count votes
-
-			let in_favour = 0;
-			let against = 0;
-
-			for (let reaction of collected) {
-				const name = reaction[0];
-				
-				in_favour += name === IN_FAVOUR_REACTION;
-				against += name === AGAINST_REACTION;
-			}
-
-			// log(`[pin vote] ${in_favour} people voted in favour, ${against} people voted against`);
-
-			// decide whether or not to pin
+			// console.log(`[pin vote] ${in_favour} people voted in favour, ${against} people voted against`);
 
 			if (in_favour < VOTE_THRESHOLD) {
 				let rich;
