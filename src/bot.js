@@ -5,17 +5,12 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const client = new Client({
-<<<<<<< HEAD
 	intents: [
 		Intents.FLAGS.GUILDS,
 		Intents.FLAGS.GUILD_MEMBERS,
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 	]
 });
-=======
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS],
-})
->>>>>>> af7c1ff8bf566687e89182a912ba0c05c2e8f9cc
 
 // register the set of commands dynamically by reading the ./commands folder
 client.commands = new Collection()
