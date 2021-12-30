@@ -8,7 +8,6 @@ module.exports = {
         .setDescription('Returns a Obo fact'),
 
     async execute(client, interaction) {
-        const id = interaction.options.getInteger('id');
 
         const options = {
             hostname: 'api.chucknorris.io',
