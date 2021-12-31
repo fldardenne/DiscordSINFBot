@@ -23,3 +23,4 @@ To run the bot, execute
 - [ ] Some funny commands (`!poop`, `!méchant`, `!criminel`,...)
 - [ ] A dynamic !help listing
 - [x] A !version command that return the commit hash on which the bot run
+- [ ] A hidden rick roll in the project (Holger is in charge)
