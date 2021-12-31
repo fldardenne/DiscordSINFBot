@@ -2,10 +2,6 @@
   "name": "discord-sinf-bot",
   "description": "The Discord bot of students in Computer Science at UCLouvain",
   "homepage": "https://github.com/fdardenne/DiscordSINFBot",
-  "scripts": {
-    "start": "node bot.js",
-    "deploy": "node deploy-commands.js"
-  },
   "dependencies": {
     "@discordjs/rest": "0.1.0-canary.0",
     "discord-api-types": "^0.23.1",
@@ -15,5 +11,8 @@
   "devDependencies": {
     "eslint": "^8.5.0",
     "prettier": "^2.5.1"
+  },
+    "engines": {
+    "node": "16.13.1"
   }
 }

@@ -9,13 +9,13 @@ Pour l'instant, tu as seulement accès aux channels communautaires.
 - Clique sur le lien qui t'est donné.
 - Une fois sur le site, coche tous les channels auxquels tu souhaites t'inscrire.
 - En pied de page se trouve le bouton "Enregistrer mon choix", mais attention tu ne pourras changer qu'une seule fois toutes les 15 minutes.
- `;
+ `
 
 /* The event is triggered when a user joins the server */
 module.exports = {
-	name: 'guildMemberAdd',
-	once: false,
-	execute(newMember) {
-		return newMember.send(WELCOME_MESSAGE);
-    }
-};
+  name: 'guildMemberAdd',
+  once: false,
+  execute(newMember) {
+    return newMember.send(WELCOME_MESSAGE)
+  },
+}
