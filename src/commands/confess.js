@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
 const { MessageEmbed } = require('discord.js')
-
-const ADMIN_CHANNEL_ID = 'ADMIN CHANNEL ID HERE (in a string)'
-const CONFESSION_CHANNEL_ID = 'CONFESSION CHANNEL ID HERE (in a string)'
+require("dotenv").config({ path: "../.env" })
 
 const VOTE_MINUTES = 60 * 24
 const IN_FAVOUR_REACTION = '✅'
@@ -23,8 +21,8 @@ module.exports = {
 
   async execute(client, interation) {
     const sin = interation.options.getString('sin')
-    const adminChannel = await client.channels.fetch(ADMIN_CHANNEL_ID)
-    const confessionChannel = await client.channels.fetch(CONFESSION_CHANNEL_ID)
+    const adminChannel = await client.channels.fetch(process.env.ADMIN_CHANNEL_ID)
+    const confessionChannel = await client.channels.fetch(process.env.CONFESSION_CHANNEL_ID)
 
     const confessionEmbed = new MessageEmbed()
       .setTitle('New confession')
@@ -71,7 +69,7 @@ module.exports = {
           .send({
             embeds: [
               new MessageEmbed()
-                .setTitle('Confession approuved')
+                .setTitle('Confession approved')
                 .setDescription(
                   `Your confession "*${sin}*" was approved. It is now available publicly.`,
                 )
@@ -140,7 +138,7 @@ module.exports = {
         new MessageEmbed()
           .setTitle('Confession sent')
           .setDescription(
-            "Your confession has been sent and is awaiting verification. If your DM's are open to everyone, you'll be notified when it has been approuved or rejected.",
+            "Your confession has been sent and is awaiting verification. If your DM's are open to everyone, you'll be notified when it has been approved or rejected.",
           )
           .setColor('BLURPLE'),
       ],
