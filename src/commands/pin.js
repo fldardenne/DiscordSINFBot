@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 
 const ROLE_NAME = "Pineur";
-const VOTE_MINUTES = 5;
+const VOTE_MINUTES = 20;
 const VOTE_THRESHOLD = 5;
 const VOTE_EXCLUDE_PINNER = true;
 
