@@ -45,7 +45,7 @@ module.exports = {
 		const message = await channel.messages.fetch(id).catch(() => undefined);
 
 		if (!message) {
-		return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
+			return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
 		}
 
 		// if we have the special role that allows us to pin, pin instantly
