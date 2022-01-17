@@ -50,24 +50,31 @@ module.exports = {
 			return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
 		}
 
+		// make sure the message is actually pinned
+
+		let is_pinned = false;
+
+		await channel.messages.fetchPinned() // javascript moment
+			.then((pinned_messages) => {
+				pinned_messages.each((pinned) => {
+					is_pinned |= pinned.id === message.id;
+				})
+			});
+
+		if (!is_pinned) {
+			return interaction.reply({ content: `Message wasn't yet pinned!`, ephemeral: true });
+		}
+
 		// if we have the special role that allows us to unpin, unpin instantly
 
 		const member = interaction.member;
 
 		if (member.roles.cache.some(role => role.name === ROLE_NAME)) {
-			try {
-				await message.unpin();
-			}
-			
-			catch (err) {
-				return interaction.reply({ content: `Message wasn't yet pinned! (${err})`, ephemeral: true });
-			}
-
+			await message.unpin();
 			return interaction.reply({ content: "Message has been unpinned!", ephemeral: true });
 		}
 
 		// otherwise, setup a vote
-		// TODO make sure the message is indeed in pins first
 
 		let rv = interaction.reply({ content: "Insufficient privileges to unpin this message!", ephemeral: true });
 
