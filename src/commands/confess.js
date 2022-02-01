@@ -31,8 +31,8 @@ module.exports = {
 
     let vote = await adminChannel.send({ embeds: [confessionEmbed] })
 
-    vote.react(IN_FAVOUR_REACTION)
-    vote.react(AGAINST_REACTION)
+    await vote.react(IN_FAVOUR_REACTION)
+    await vote.react(AGAINST_REACTION)
 
     const filter = (reaction, user) => {
       return (
@@ -44,11 +44,10 @@ module.exports = {
     let collector = vote.createReactionCollector({
       filter,
       time: VOTE_MINUTES * 60 * 1000,
+      max: 1
     })
 
     collector.on('collect', async (reaction, user) => {
-      collector.stop()
-
       if (reaction.emoji.name === IN_FAVOUR_REACTION) {
         await vote.edit({
           embeds: [
