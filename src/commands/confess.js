@@ -19,8 +19,8 @@ module.exports = {
         .setRequired(true),
     ),
 
-  async execute(client, interation) {
-    const sin = interation.options.getString('sin')
+  async execute(client, interaction) {
+    const sin = interaction.options.getString('sin')
     const adminChannel = await client.channels.fetch(process.env.ADMIN_CHANNEL_ID)
     const confessionChannel = await client.channels.fetch(process.env.CONFESSION_CHANNEL_ID)
 
@@ -46,11 +46,11 @@ module.exports = {
       time: VOTE_MINUTES * 60 * 1000,
     })
 
-    collector.on('collect', (reaction, user) => {
+    collector.on('collect', async (reaction, user) => {
       collector.stop()
 
       if (reaction.emoji.name === IN_FAVOUR_REACTION) {
-        vote.edit({
+        await vote.edit({
           embeds: [
             new MessageEmbed()
               .setTitle('Confession approved')
@@ -63,9 +63,9 @@ module.exports = {
           ],
         })
 
-        confessionChannel.send({ embeds: [confessionEmbed] })
+        await confessionChannel.send({ embeds: [confessionEmbed] })
 
-        interation.member
+        await interaction.member
           .send({
             embeds: [
               new MessageEmbed()
@@ -78,7 +78,7 @@ module.exports = {
           })
           .catch(() => undefined)
       } else {
-        vote.edit({
+        await vote.edit({
           embeds: [
             new MessageEmbed()
               .setTitle('Confession rejected')
@@ -91,7 +91,7 @@ module.exports = {
           ],
         })
 
-        interation.member
+        await interaction.member
           .send({
             embeds: [
               new MessageEmbed()
@@ -106,10 +106,10 @@ module.exports = {
       }
     })
 
-    collector.on('end', (collected, reason) => {
+    collector.on('end', async (collected, reason) => {
       if (reason === 'time') {
         // Vote timed out
-        vote.edit({
+        await vote.edit({
           embeds: [
             new MessageEmbed()
               .setTitle('Vote timed out')
@@ -118,7 +118,7 @@ module.exports = {
           ],
         })
 
-        interation.member
+        await interaction.member
           .send({
             embeds: [
               new MessageEmbed()
@@ -133,7 +133,7 @@ module.exports = {
       }
     })
 
-    return interation.reply({
+    return interaction.reply({
       embeds: [
         new MessageEmbed()
           .setTitle('Confession sent')
