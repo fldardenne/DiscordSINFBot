@@ -1,3 +1,5 @@
+// TODO combine common functions between this & pin.js (and perhaps also the voting system from confess.js)
+
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 
@@ -20,7 +22,7 @@ const ICONS = {
 
 function gen_rich(content, icon, colour) {
 	const embed = new MessageEmbed()
-		.setTitle("Pin vote")
+		.setTitle("Unpin vote")
 		.setDescription(content)
 		.setThumbnail(ICONS[icon])
 		.setColor(colour);
@@ -30,11 +32,11 @@ function gen_rich(content, icon, colour) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('pin')
-		.setDescription('Allows non-administrators to pin messages')
+		.setName('unpin')
+		.setDescription('Allows non-administrators to unpin messages')
 		.addStringOption(option => option
 			.setName('id')
-			.setDescription('ID of the message you want to pin')
+			.setDescription('ID of the message you want to unpin')
 			.setRequired(true),
     	),
 
@@ -48,20 +50,35 @@ module.exports = {
 			return interaction.reply({ content: "Message could not be found! Are you sure you're passing a valid message ID?", ephemeral: true });
 		}
 
-		// if we have the special role that allows us to pin, pin instantly
+		// make sure the message is actually pinned
+
+		let is_pinned = false;
+
+		await channel.messages.fetchPinned() // javascript moment
+			.then((pinned_messages) => {
+				pinned_messages.each((pinned) => {
+					is_pinned |= pinned.id === message.id;
+				})
+			});
+
+		if (!is_pinned) {
+			return interaction.reply({ content: `Message wasn't yet pinned!`, ephemeral: true });
+		}
+
+		// if we have the special role that allows us to unpin, unpin instantly
 
 		const member = interaction.member;
 
 		if (member.roles.cache.some(role => role.name === ROLE_NAME)) {
-			await message.pin();
-			return interaction.reply({ content: "Message has been pinned!", ephemeral: true });
+			await message.unpin();
+			return interaction.reply({ content: "Message has been unpinned!", ephemeral: true });
 		}
 
 		// otherwise, setup a vote
 
-		let rv = interaction.reply({ content: "Insufficient privileges to pin this message!", ephemeral: true });
+		let rv = interaction.reply({ content: "Insufficient privileges to unpin this message!", ephemeral: true });
 
-		const rich = gen_rich(`${interaction.user.tag} has insufficient privileges to pin this message! We will now proceed to a vote! After ${VOTE_MINUTES} minutes, if there are at least ${VOTE_THRESHOLD} votes in favour of this pin and there are more people in favour than against it, your message will be pinned!`, "angry", "#ff7733");
+		const rich = gen_rich(`${interaction.user.tag} has insufficient privileges to unpin this message! We will now proceed to a vote! After ${VOTE_MINUTES} minutes, if there are at least ${VOTE_THRESHOLD} votes in favour of this unpin and there are more people in favour than against it, your message will be unpinned!`, "angry", "#ff7733");
 		let vote = await message.reply({ embeds: [rich] });
 
 		vote.react(IN_FAVOUR_REACTION);
@@ -97,24 +114,24 @@ module.exports = {
 			against += name === AGAINST_REACTION;
 		});
 		
-		// once time is up, decide whether or not to pin
+		// once time is up, decide whether or not to unpin
 
 		collector.on('end', collected => {
-			// console.log(`[pin vote] ${in_favour} people voted in favour, ${against} people voted against`);
+			// console.log(`[unpin vote] ${in_favour} people voted in favour, ${against} people voted against`);
 
 			if (in_favour < VOTE_THRESHOLD) {
 				let rich;
 				
 				if (in_favour == 0) {
-					rich = gen_rich(`No one voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be pinned.`, "silly", "#ff7777");
+					rich = gen_rich(`No one voted in favour of unpinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be unpinned.`, "silly", "#ff7777");
 				}
 
 				else if (in_favour == 1) {
-					rich = gen_rich(`Only one person voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be pinned.`, "sadge", "#ff7777");
+					rich = gen_rich(`Only one person voted in favour of unpinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be unpinned.`, "sadge", "#ff7777");
 				}
 
 				else {
-					rich = gen_rich(`Only ${in_favour} people voted in favour of pinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be pinned.`, "uncool", "#ff7777");
+					rich = gen_rich(`Only ${in_favour} people voted in favour of unpinning this message (threshold is ${VOTE_THRESHOLD}). Message will not be unpinned.`, "uncool", "#ff7777");
 				}
 
 				vote.reply({ embeds: [rich] });
@@ -122,18 +139,18 @@ module.exports = {
 			}
 
 			if (against >= in_favour) {
-				const rich = gen_rich(`More or the same number of people voted against the pin as in favour of the pin (${against} vs ${in_favour}). Message will not be pinned.`, "waah", "#ff7777");
+				const rich = gen_rich(`More or the same number of people voted against the unpin as in favour of the unpin (${against} vs ${in_favour}). Message will not be unpinned.`, "waah", "#ff7777");
 
 				vote.reply({ embeds: [rich] });
 				return;
 			}
 
-			// finally, pin the message
+			// finally, unpin the message
 
-			const rich = gen_rich("Vote was successful! Message will now be pinned!", "salute", "#77ff77");
+			const rich = gen_rich("Vote was successful! Message will now be unpinned!", "salute", "#77ff77");
 			vote.reply({ embeds: [rich] });
 
-			message.pin();
+			message.unpin();
 		});
 
 		return rv;
