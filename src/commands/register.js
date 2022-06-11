@@ -29,6 +29,33 @@ const CATEGORIES = [
 	{ label: "Other minors", value: "minors" },
 ]
 
+function join_course_channels(courses) {
+	let str = ""
+	const count = courses.length
+
+	for (const [ i, course ] of courses.entries()) {
+		// TODO actually add the user to the channel
+
+		str += `#${course.value}`
+
+		if (i <= count - 2) {
+			str += ", "
+		}
+
+		if (i == count - 2) {
+			str += "and "
+		}
+	}
+
+	let space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark = ""
+
+	if (count > 10) {
+		space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark = " Oof, that's a lot!"
+	}
+
+	return [ str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ]
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('register')
@@ -67,8 +94,7 @@ module.exports = {
 				new MessageButton()
 					.setCustomId("granular")
 					.setLabel("Only specific courses")
-					.setStyle("SECONDARY")
-					.setDisabled(true),
+					.setStyle("SECONDARY"),
 
 				new MessageButton()
 					.setCustomId("all")
@@ -76,7 +102,13 @@ module.exports = {
 					.setStyle("PRIMARY")
 			)
 
-		// finally, we tell the user they're done, and invite them to give a shitty take about the course in question
+		// if they asked for granular control over which channels they join, slap them with another dropdown
+
+		const granular_embed = new MessageEmbed()
+			.setTitle("Select course channels")
+			.setColor("BLURPLE")
+
+		// finally, we tell the user they're done, and invite them to idk do something
 
 		const done_embed = new MessageEmbed()
 			.setTitle("All done!")
@@ -116,30 +148,55 @@ module.exports = {
 			// specificity selection
 
 			if (component.customId === "all") {
-				let channels_str = ""
+				const [ channels_str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = join_course_channels(selected_category.courses)
 				const course_count = selected_category.courses.length
 
-				for (const [ i, course ] of selected_category.courses.entries()) {
-					// TODO actually add the user to the channel
+				done_embed.setDescription(`You have been registered to all ${course_count} of the channels of ${selected_category.label} (${channels_str})!${space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-					channels_str += `#${course.value}`
+				component.update({
+					embeds: [ done_embed ],
+					components: [],
+				})
+			}
 
-					if (i < course_count - 2) {
-						channels_str += ", "
+			if (component.customId === "granular") {
+				granular_embed.setDescription(`You asked to join only specific channels from the ${selected_category.label} category, and we delivered. Which channels would you like to join? You can select multiple (scrolling may be necessary to see all of them on desktop). You can *still* still cancel now by dismissing this message.`)
+
+				const granular_row = new MessageActionRow()
+					.addComponents(
+						new MessageSelectMenu()
+							.setCustomId("courses")
+							.setPlaceholder("Select courses")
+							.setOptions(selected_category.courses)
+
+							// user can select as many categories as they want
+
+							.setMinValues(1)
+							.setMaxValues(selected_category.courses.length)
+					)
+
+				component.update({
+					embeds: [ granular_embed ],
+					components: [ granular_row ]
+				})
+			}
+
+			// course selection (only if user selected granular specificity)
+
+			if (component.customId === "courses") {
+				let courses = []
+
+				for (const course of selected_category.courses) {
+					if (!component.values.includes(course.value)) {
+						continue
 					}
 
-					if (i == course_count - 2) {
-						channels_str += "and "
-					}
+					courses.push(course)
 				}
 
-				let oof_comma_that_apostrophe_s_a_lot_exclamation_mark_space = ""
+				const [ channels_str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = join_course_channels(courses)
 
-				if (course_count > 10) {
-					oof_comma_that_apostrophe_s_a_lot_exclamation_mark_space = "Oof, that's a lot! "
-				}
-
-				done_embed.setDescription(`You have been registered to all ${course_count} of the channels of ${selected_category.label} (${channels_str})! ${oof_comma_that_apostrophe_s_a_lot_exclamation_mark_space}Don't forget to give an opinion no one asked for on the course in question!`)
+				done_embed.setDescription(`You have been registered to ${channels_str}!${space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
 				component.update({
 					embeds: [ done_embed ],
