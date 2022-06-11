@@ -10,6 +10,10 @@ const commandFiles = fs
   .filter(file => file.endsWith('.js'))
 
 for (const file of commandFiles) {
+  if (file.startsWith('.')) {
+    continue;
+  }
+
   const command = require(`./commands/${file}`)
   commands.push(command.data.toJSON())
 }
