@@ -98,8 +98,6 @@ module.exports = {
 
 			// instantly pin/dismiss message if vote comes from someone with the pinner role
 
-			console.log(member)
-
 			if (member.roles.cache.some(role => role.name === ROLE_NAME)) {
 				cancelled = true;
 

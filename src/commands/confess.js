@@ -99,6 +99,8 @@ module.exports = {
     })
 
     collector.on('end', async (collected, reason) => {
+      vote.reactions.removeAll()
+
       if (reason === 'time') {
         // Vote timed out
         await vote.edit({
