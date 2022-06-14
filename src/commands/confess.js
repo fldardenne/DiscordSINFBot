@@ -50,18 +50,14 @@ module.exports = {
       collector.stop()
 
       if (reaction.emoji.name === IN_FAVOUR_REACTION) {
-        // await vote.edit({
-        //   embeds: [
-        //     new MessageEmbed()
-        //       .setTitle('Confession approved')
-        //       .setDescription(sin)
-        //       .setColor('GREEN')
-        //       .setFooter({
-        //         text: `Approved by ${user.tag}`,
-        //         iconURL: user.displayAvatarURL(),
-        //       }),
-        //   ],
-        // })
+        await vote.edit({
+          embeds: [
+            new MessageEmbed()
+              .setTitle('Confession approved')
+              .setDescription(sin)
+              .setColor('GREEN'),
+          ],
+        })
 
         await confessionChannel.send({ embeds: [confessionEmbed] })
 
@@ -78,18 +74,14 @@ module.exports = {
           })
           .catch(() => undefined)
       } else {
-        // await vote.edit({
-        //   embeds: [
-        //     new MessageEmbed()
-        //       .setTitle('Confession rejected')
-        //       .setDescription(sin)
-        //       .setColor('RED')
-        //       .setFooter({
-        //         text: `Rejected by ${user.tag}`,
-        //         iconURL: user.displayAvatarURL(),
-        //       }),
-        //   ],
-        // })
+        await vote.edit({
+          embeds: [
+            new MessageEmbed()
+              .setTitle('Confession rejected')
+              .setDescription(sin)
+              .setColor('RED'),
+          ],
+        })
 
         await interaction.member
           .send({
