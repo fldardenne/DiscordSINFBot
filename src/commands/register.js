@@ -1,42 +1,24 @@
 // the Discord API doesn't really allow for easily making serial forms like this, so it's not the most readable code ever
 // but, as Karl Marx once said, "Das ist das dritte mal diese Woche, dass einer der Patienten spontane Selbstenzündung erlitt."
 
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageButton } = require("discord.js");
-const { MessageSelectMenu } = require("discord.js");
-const { MessageActionRow } = require("discord.js");
-const { MessageEmbed } = require("discord.js");
+const { SlashCommandBuilder } = require("@discordjs/builders")
+const { MessageButton } = require("discord.js")
+const { MessageSelectMenu } = require("discord.js")
+const { MessageActionRow } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
+const { readFileSync } = require("fs")
 
 const TIMEOUT_MINUTES = 15
 
-const CATEGORIES = [
-	{ label: "BAC1", value: "bac1", description: "1st year students", courses: [
-		{ label: "LINFO1111 (Analyse)",                         value: "linfo1111-analyse" },
-		{ label: "LINFO1101 (Introduction à la programmation)", value: "linfo1101-introduction-programmation" },
-		{ label: "LINFO1115b (Économie politique)",             value: "linfo1115b-economie-politique" },
-		{ label: "LINFO1001 (Projets en informatique 1)",       value: "linfo1001-projets-informatique-1" },
-		{ label: "LESPO1113d (Sociologie 🤮)",                  value: "lespo1113d-sociologie" },
-		{ label: "LINFO1140 (Électroniques)",                   value: "lespo1140-électroniques" },
-		{ label: "LINFO1103 (Algorithmique)",                   value: "lespo1103-algorithmique" },
-		{ label: "LINFO1002 (Projets en informatique 2)",       value: "linfo1002-projet-en-informatique-2" },
-		{ label: "LCOPS1124c (Philosophie)",                    value: "lcops1124c-philosophie" },
-		{ label: "LINFO1112 (Algèbre)",                         value: "linfo1112-algebre" },
-		{ label: "LESPO1122c (Droit)",                          value: "lespo1122c-droit" },
-	]},
-	{ label: "BAC2", value: "bac2", description: "2nd year students" },
-	{ label: "BAC3", value: "bac3", description: "3rd year students" },
-	{ label: "APPSINF", value: "appsinf", description: "Approfondissement en sciences informatiques" },
-	{ label: "Other minors", value: "minors" },
-]
-
-function join_course_channels(courses) {
+async function join_channels(interaction, channels) {
 	let str = ""
-	const count = courses.length
+	const count = channels.length
 
-	for (const [ i, course ] of courses.entries()) {
-		// TODO actually add the user to the channel
+	for (const [ i, ent ] of channels.entries()) {
+		const channel = interaction.guild.channels.cache.get(ent.value)
 
-		str += `#${course.value}`
+		channel.permissionOverwrites.create(interaction.user, { SEND_MESSAGES: true, VIEW_CHANNEL: true })
+		str += `${channel}` // interpolate to call .toString on GuildChannel instance
 
 		if (i <= count - 2) {
 			str += ", "
@@ -47,34 +29,39 @@ function join_course_channels(courses) {
 		}
 	}
 
-	let space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark = ""
+	let space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark = ""
 
 	if (count > 10) {
-		space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark = " Oof, that's a lot!"
+		space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark = " Oof, that's a lot!"
 	}
 
-	return [ str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ]
+	return [ str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ]
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('register')
-		.setDescription('Allows non-administrators to join course-related channels'),
+		.setDescription('Allows non-administrators to join certain channels'),
 
 	async execute(client, interaction) {
-		// first thing to do here is send a dropdown for the different categories for the user to choose from
+		// read the database of channels
+		// not super super ideal to read this each time, but we're using node anyway, it's not like this is using up comparatively many resources ;)
+
+		const channels = JSON.parse(readFileSync("channels.json"))
+
+		// first part of the form thing is a dropdown for the different categories the user can choose from
 
 		const category_embed = new MessageEmbed()
 			.setTitle("Category selection")
-			.setDescription("Which category is the course you wanna join in? You can cancel now by dismissing this message.")
+			.setDescription("Which category is the channel you wanna join in? You can cancel now by dismissing this message.")
 			.setColor("BLURPLE")
 
 		const category_row = new MessageActionRow()
 			.addComponents(
 				new MessageSelectMenu()
 					.setCustomId("category")
-					.setPlaceholder("Select course category")
-					.setOptions(CATEGORIES)
+					.setPlaceholder("Select channel category")
+					.setOptions(channels.categories)
 
 					// user can't select multiple categories at a time
 
@@ -83,7 +70,7 @@ module.exports = {
 			)
 
 		// then, we ask how specific the user would like to be
-		// i.e., do they want to join all course channels of a category, or only a few?
+		// i.e., do they want to join all channels of a category, or only a few?
 
 		const specificity_embed = new MessageEmbed()
 			.setTitle("Choose specificity")
@@ -93,19 +80,19 @@ module.exports = {
 			.addComponents(
 				new MessageButton()
 					.setCustomId("granular")
-					.setLabel("Only specific courses")
+					.setLabel("Only specific channels")
 					.setStyle("SECONDARY"),
 
 				new MessageButton()
 					.setCustomId("all")
-					.setLabel("All courses")
+					.setLabel("All channels")
 					.setStyle("PRIMARY")
 			)
 
 		// if they asked for granular control over which channels they join, slap them with another dropdown
 
 		const granular_embed = new MessageEmbed()
-			.setTitle("Select course channels")
+			.setTitle("Select channels")
 			.setColor("BLURPLE")
 
 		// finally, we tell the user they're done, and invite them to idk do something
@@ -128,7 +115,7 @@ module.exports = {
 			if (component.customId === "category") {
 				let name = "Unknown"
 
-				for (const category of CATEGORIES) {
+				for (const category of channels.categories) {
 					if (category.value !== component.values[0]) {
 						continue
 					}
@@ -137,7 +124,7 @@ module.exports = {
 					name = category.label
 				}
 
-				specificity_embed.setDescription(`Would you like to join all course channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
+				specificity_embed.setDescription(`Would you like to join all channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
 
 				component.update({
 					embeds: [ specificity_embed ],
@@ -148,10 +135,10 @@ module.exports = {
 			// specificity selection
 
 			if (component.customId === "all") {
-				const [ channels_str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = join_course_channels(selected_category.courses)
-				const course_count = selected_category.courses.length
+				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await join_channels(interaction, selected_category.channels)
+				const channel_count = selected_category.channels.length
 
-				done_embed.setDescription(`You have been registered to all ${course_count} of the channels of ${selected_category.label} (${channels_str})!${space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been registered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
 				component.update({
 					embeds: [ done_embed ],
@@ -165,14 +152,14 @@ module.exports = {
 				const granular_row = new MessageActionRow()
 					.addComponents(
 						new MessageSelectMenu()
-							.setCustomId("courses")
-							.setPlaceholder("Select courses")
-							.setOptions(selected_category.courses)
+							.setCustomId("channels")
+							.setPlaceholder("Select channels")
+							.setOptions(selected_category.channels)
 
 							// user can select as many categories as they want
 
 							.setMinValues(1)
-							.setMaxValues(selected_category.courses.length)
+							.setMaxValues(selected_category.channels.length)
 					)
 
 				component.update({
@@ -181,22 +168,22 @@ module.exports = {
 				})
 			}
 
-			// course selection (only if user selected granular specificity)
+			// channel selection (only if user selected granular specificity)
 
-			if (component.customId === "courses") {
-				let courses = []
+			if (component.customId === "channels") {
+				let channels = []
 
-				for (const course of selected_category.courses) {
-					if (!component.values.includes(course.value)) {
+				for (const channel of selected_category.channels) {
+					if (!component.values.includes(channel.value)) {
 						continue
 					}
 
-					courses.push(course)
+					channels.push(channel)
 				}
 
-				const [ channels_str, space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = join_course_channels(courses)
+				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await join_channels(interaction, channels)
 
-				done_embed.setDescription(`You have been registered to ${channels_str}!${space_oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been registered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
 				component.update({
 					embeds: [ done_embed ],
