@@ -47,7 +47,11 @@ module.exports = {
 		// read the database of channels
 		// not super super ideal to read this each time, but we're using node anyway, it's not like this is using up comparatively many resources ;)
 
+		console.log("registration request")
+
 		const channels = JSON.parse(readFileSync("channels.json"))
+
+		console.log("channels.json loaded")
 
 		// first part of the form thing is a dropdown for the different categories the user can choose from
 
@@ -101,15 +105,21 @@ module.exports = {
 			.setTitle("All done!")
 			.setColor("BLURPLE")
 
+		console.log("message embeds created")
+
 		// create collector for component interactions
 		// we wanna filter out all interactions not made by the user who executed this command
 
 		const filter = component => component.user.id === interaction.user.id
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: TIMEOUT_MINUTES * 60 * 1000 })
 
+		console.log("collector created")
+
 		let selected_category
 
 		collector.on('collect', async component => {
+			console.log(`collected (${component.customId})`)
+
 			// category selection
 
 			if (component.customId === "category") {
@@ -126,7 +136,7 @@ module.exports = {
 
 				specificity_embed.setDescription(`Would you like to join all channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
 
-				component.update({
+				await component.update({
 					embeds: [ specificity_embed ],
 					components: [ specificity_row ],
 				})
@@ -140,7 +150,7 @@ module.exports = {
 
 				done_embed.setDescription(`You have been registered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				component.update({
+				await component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
@@ -162,7 +172,7 @@ module.exports = {
 							.setMaxValues(selected_category.channels.length)
 					)
 
-				component.update({
+				await component.update({
 					embeds: [ granular_embed ],
 					components: [ granular_row ]
 				})
@@ -185,11 +195,13 @@ module.exports = {
 
 				done_embed.setDescription(`You have been registered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				component.update({
+				await component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
 			}
+
+			console.log("component updated")
 		})
 
 		// actually send the message
