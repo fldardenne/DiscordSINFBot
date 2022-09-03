@@ -138,7 +138,7 @@ module.exports = {
 				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await leave_channels(interaction, selected_category.channels)
 				const channel_count = selected_category.channels.length
 
-				done_embed.setDescription(`You have been registered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been unregistered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
 				component.update({
 					embeds: [ done_embed ],
@@ -183,7 +183,7 @@ module.exports = {
 
 				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await leave_channels(interaction, channels)
 
-				done_embed.setDescription(`You have been registered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been unregistered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
 				component.update({
 					embeds: [ done_embed ],
