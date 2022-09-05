@@ -101,10 +101,21 @@ module.exports = {
 			.setTitle("All done!")
 			.setColor("BLURPLE")
 
-		// create collector for component interactions
-		// we wanna filter out all interactions not made by the user who executed this command
+		// actually send the message
+		// this message will be edited each step of the way
 
-		const filter = component => component.user.id === interaction.user.id
+		await interaction.reply({
+			embeds: [ category_embed ],
+			components: [ category_row ],
+			ephemeral: true,
+		})
+
+		const reply = await interaction.fetchReply()
+
+		// create collector for component interactions
+		// we wanna filter out all interactions not made on the message we replied
+
+		const filter = component => reply.id === component.message.id
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: TIMEOUT_MINUTES * 60 * 1000 })
 
 		let selected_category
@@ -144,6 +155,8 @@ module.exports = {
 					embeds: [ done_embed ],
 					components: [],
 				})
+
+				collector.stop()
 			}
 
 			if (component.customId === "granular") {
@@ -189,6 +202,8 @@ module.exports = {
 					embeds: [ done_embed ],
 					components: [],
 				})
+
+				collector.stop()
 			}
 		})
 
