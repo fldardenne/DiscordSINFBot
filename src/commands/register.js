@@ -116,10 +116,12 @@ module.exports = {
 			ephemeral: true,
 		})
 
+		const reply = await interaction.fetchReply()
+
 		// create collector for component interactions
 		// we wanna filter out all interactions not made by the user who executed this command
 
-		const filter = component => component.user.id === interaction.user.id
+		const filter = component => reply.id == component.message.id
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: TIMEOUT_MINUTES * 60 * 1000 })
 
 		console.log("collector created")
