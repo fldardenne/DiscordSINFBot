@@ -47,11 +47,7 @@ module.exports = {
 		// read the database of channels
 		// not super super ideal to read this each time, but we're using node anyway, it's not like this is using up comparatively many resources ;)
 
-		console.log("registration request")
-
 		const channels = JSON.parse(readFileSync("channels.json"))
-
-		console.log("channels.json loaded")
 
 		// first part of the form thing is a dropdown for the different categories the user can choose from
 
@@ -105,8 +101,6 @@ module.exports = {
 			.setTitle("All done!")
 			.setColor("BLURPLE")
 
-		console.log("message embeds created")
-
 		// actually send the message
 		// this message will be edited each step of the way
 
@@ -124,13 +118,9 @@ module.exports = {
 		const filter = component => reply.id == component.message.id
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: TIMEOUT_MINUTES * 60 * 1000 })
 
-		console.log("collector created")
-
 		let selected_category
 
 		collector.on('collect', async component => {
-			console.log(`collected (${component.customId})`)
-
 			// category selection
 
 			if (component.customId === "category") {
@@ -166,7 +156,7 @@ module.exports = {
 					components: [],
 				})
 
-				collector.stop();
+				collector.stop()
 			}
 
 			if (component.customId === "granular") {
@@ -213,10 +203,8 @@ module.exports = {
 					components: [],
 				})
 
-				collector.stop();
+				collector.stop()
 			}
-
-			console.log("component updated")
 		})
 	}
 }
