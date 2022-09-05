@@ -107,6 +107,15 @@ module.exports = {
 
 		console.log("message embeds created")
 
+		// actually send the message
+		// this message will be edited each step of the way
+
+		await interaction.reply({
+			embeds: [ category_embed ],
+			components: [ category_row ],
+			ephemeral: true,
+		})
+
 		// create collector for component interactions
 		// we wanna filter out all interactions not made by the user who executed this command
 
@@ -176,6 +185,8 @@ module.exports = {
 					embeds: [ granular_embed ],
 					components: [ granular_row ]
 				})
+
+				collector.stop();
 			}
 
 			// channel selection (only if user selected granular specificity)
@@ -199,18 +210,11 @@ module.exports = {
 					embeds: [ done_embed ],
 					components: [],
 				})
+
+				collector.stop();
 			}
 
 			console.log("component updated")
-		})
-
-		// actually send the message
-		// this message will be edited each step of the way
-
-		await interaction.reply({
-			embeds: [ category_embed ],
-			components: [ category_row ],
-			ephemeral: true,
 		})
 	}
 }
