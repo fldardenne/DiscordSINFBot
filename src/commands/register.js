@@ -165,6 +165,8 @@ module.exports = {
 					embeds: [ done_embed ],
 					components: [],
 				})
+
+				collector.stop();
 			}
 
 			if (component.customId === "granular") {
@@ -187,8 +189,6 @@ module.exports = {
 					embeds: [ granular_embed ],
 					components: [ granular_row ]
 				})
-
-				collector.stop();
 			}
 
 			// channel selection (only if user selected granular specificity)
