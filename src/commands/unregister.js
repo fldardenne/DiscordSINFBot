@@ -10,14 +10,14 @@ const { readFileSync } = require("fs")
 
 const TIMEOUT_MINUTES = 15
 
-async function join_channels(interaction, channels) {
+async function leave_channels(interaction, channels) {
 	let str = ""
 	const count = channels.length
 
 	for (const [ i, ent ] of channels.entries()) {
 		const channel = interaction.guild.channels.cache.get(ent.value)
 
-		channel.permissionOverwrites.create(interaction.user, { SEND_MESSAGES: true, VIEW_CHANNEL: true })
+		channel.permissionOverwrites.delete(interaction.user)
 		str += `${channel}` // interpolate to call .toString on GuildChannel instance
 
 		if (i <= count - 2) {
@@ -40,8 +40,8 @@ async function join_channels(interaction, channels) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('register')
-		.setDescription('Allows non-administrators to join certain channels'),
+		.setName('unregister')
+		.setDescription('Allows non-administrators to leave certain channels'),
 
 	async execute(client, interaction) {
 		// read the database of channels
@@ -53,7 +53,7 @@ module.exports = {
 
 		const category_embed = new MessageEmbed()
 			.setTitle("Category selection")
-			.setDescription("Which category is the channel you wanna join in? You can cancel now by dismissing this message.")
+			.setDescription("Which category is the channel you wanna leave in? You can cancel now by dismissing this message.")
 			.setColor("BLURPLE")
 
 		const category_row = new MessageActionRow()
@@ -70,7 +70,7 @@ module.exports = {
 			)
 
 		// then, we ask how specific the user would like to be
-		// i.e., do they want to join all channels of a category, or only a few?
+		// i.e., do they want to leave all channels of a category, or only a few?
 
 		const specificity_embed = new MessageEmbed()
 			.setTitle("Choose specificity")
@@ -89,7 +89,7 @@ module.exports = {
 					.setStyle("PRIMARY")
 			)
 
-		// if they asked for granular control over which channels they join, slap them with another dropdown
+		// if they asked for granular control over which channels they leave, slap them with another dropdown
 
 		const granular_embed = new MessageEmbed()
 			.setTitle("Select channels")
@@ -135,9 +135,9 @@ module.exports = {
 					name = category.label
 				}
 
-				specificity_embed.setDescription(`Would you like to join all channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
+				specificity_embed.setDescription(`Would you like to leave all channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
 
-				await component.update({
+				component.update({
 					embeds: [ specificity_embed ],
 					components: [ specificity_row ],
 				})
@@ -146,12 +146,12 @@ module.exports = {
 			// specificity selection
 
 			if (component.customId === "all") {
-				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await join_channels(interaction, selected_category.channels)
+				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await leave_channels(interaction, selected_category.channels)
 				const channel_count = selected_category.channels.length
 
-				done_embed.setDescription(`You have been registered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been unregistered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				await component.update({
+				component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
@@ -160,7 +160,7 @@ module.exports = {
 			}
 
 			if (component.customId === "granular") {
-				granular_embed.setDescription(`You asked to join only specific channels from the ${selected_category.label} category, and we delivered. Which channels would you like to join? You can select multiple (scrolling may be necessary to see all of them on desktop). You can *still* still cancel now by dismissing this message.`)
+				granular_embed.setDescription(`You asked to leave only specific channels from the ${selected_category.label} category, and we delivered. Which channels would you like to leave? You can select multiple (scrolling may be necessary to see all of them on desktop). You can *still* still cancel now by dismissing this message.`)
 
 				const granular_row = new MessageActionRow()
 					.addComponents(
@@ -175,7 +175,7 @@ module.exports = {
 							.setMaxValues(selected_category.channels.length)
 					)
 
-				await component.update({
+				component.update({
 					embeds: [ granular_embed ],
 					components: [ granular_row ]
 				})
@@ -194,17 +194,26 @@ module.exports = {
 					channels.push(channel)
 				}
 
-				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await join_channels(interaction, channels)
+				const [ channels_str, space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark ] = await leave_channels(interaction, channels)
 
-				done_embed.setDescription(`You have been registered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
+				done_embed.setDescription(`You have been unregistered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				await component.update({
+				component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
 
 				collector.stop()
 			}
+		})
+
+		// actually send the message
+		// this message will be edited each step of the way
+
+		await interaction.reply({
+			embeds: [ category_embed ],
+			components: [ category_row ],
+			ephemeral: true,
 		})
 	}
 }

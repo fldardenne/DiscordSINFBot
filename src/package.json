@@ -3,7 +3,6 @@
   "description": "The Discord bot of students in Computer Science at UCLouvain",
   "homepage": "https://github.com/fdardenne/DiscordSINFBot",
   "scripts": {
-    "daemon": "while [ 1 ]; do nohup npm start; done",
     "start": "node bot.js",
     "deploy": "node deploy-commands.js"
   },
