@@ -137,7 +137,7 @@ module.exports = {
 
 				specificity_embed.setDescription(`Would you like to leave all channels of your selected category (${name}) or only a few? You can still cancel now by dismissing this message.`)
 
-				component.update({
+				await component.update({
 					embeds: [ specificity_embed ],
 					components: [ specificity_row ],
 				})
@@ -151,7 +151,7 @@ module.exports = {
 
 				done_embed.setDescription(`You have been unregistered to all ${channel_count} of the channels of ${selected_category.label} (${channels_str})!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				component.update({
+				await component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
@@ -175,7 +175,7 @@ module.exports = {
 							.setMaxValues(selected_category.channels.length)
 					)
 
-				component.update({
+				await component.update({
 					embeds: [ granular_embed ],
 					components: [ granular_row ]
 				})
@@ -198,22 +198,13 @@ module.exports = {
 
 				done_embed.setDescription(`You have been unregistered to ${channels_str}!${space_Oof_comma_that_apostrophe_s_a_lot_exclamation_mark}`)
 
-				component.update({
+				await component.update({
 					embeds: [ done_embed ],
 					components: [],
 				})
 
 				collector.stop()
 			}
-		})
-
-		// actually send the message
-		// this message will be edited each step of the way
-
-		await interaction.reply({
-			embeds: [ category_embed ],
-			components: [ category_row ],
-			ephemeral: true,
 		})
 	}
 }
