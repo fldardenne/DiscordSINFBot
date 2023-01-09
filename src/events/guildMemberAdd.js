@@ -5,10 +5,9 @@ Nous organisons également régulièrement des petits événements: le meme cont
 
 Pour l'instant, tu as seulement accès aux channels communautaires.
 
-- Envoie la commande .registerChans en DM au @SinfBot.
-- Clique sur le lien qui t'est donné.
-- Une fois sur le site, coche tous les channels auxquels tu souhaites t'inscrire.
-- En pied de page se trouve le bouton "Enregistrer mon choix", mais attention tu ne pourras changer qu'une seule fois toutes les 15 minutes.
+Utilise la commande /register n'importe où sur le serveur pour t'inscrire aux channels de cours.
+
+N'oublie pas de lire les règles
  `
 
 /* The event is triggered when a user joins the server */
