@@ -17,6 +17,10 @@ async function join_channels(interaction, channels) {
 	for (const [ i, ent ] of channels.entries()) {
 		const channel = interaction.guild.channels.cache.get(ent.value)
 
+		if (!channel) {
+			continue
+		}
+
 		channel.permissionOverwrites.create(interaction.user, { SEND_MESSAGES: true, VIEW_CHANNEL: true })
 		str += `${channel}` // interpolate to call .toString on GuildChannel instance
 
