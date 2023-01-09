@@ -17,6 +17,10 @@ async function leave_channels(interaction, channels) {
 	for (const [ i, ent ] of channels.entries()) {
 		const channel = interaction.guild.channels.cache.get(ent.value)
 
+		if (!channel) {
+			continue
+		}
+
 		channel.permissionOverwrites.delete(interaction.user)
 		str += `${channel}` // interpolate to call .toString on GuildChannel instance
 
