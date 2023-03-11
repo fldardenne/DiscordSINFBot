@@ -12,22 +12,6 @@ const client = new Client({
 	]
 });
 
-// if there is an event and this event is a command
-client.on('interactionCreate', async interaction => {
-	if(!interaction.isCommand()) return;
-
-	const command = client.commands.get(interaction.commandName);
-	if(!command) return interaction.reply({ content: "Unknown command!", ephemeral: true });
-
-	try {
-		console.log(command);
-		await command.execute(client, interaction);
-	} catch(err) {
-		console.error(err);
-		return interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-});
-
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
