@@ -2,13 +2,17 @@
 
 ## How to install ?
 Clone the project and install the dependencies in the `src` folder by running
-```npm install```
+```
+npm install
+```
 
 Create the `src/.env` file, paste in the content of `.env.example` by modifying the variables appropriately.
 To create a bot and get the token, go to https://discord.com/developers/applications.
 
 To run the bot, execute
-```node bot.js```
+```
+node bot.js
+```
 > The commands will be registered automatically
 
 ## Roadmap dev
