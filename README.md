@@ -2,7 +2,7 @@
 
 ## How to install ?
 Clone the project and install the dependencies in the `src` folder by running
-```
+```console
 npm install
 ```
 
@@ -10,10 +10,10 @@ Create the `src/.env` file, paste in the content of `.env.example` by modifying 
 To create a bot and get the token, go to https://discord.com/developers/applications.
 
 To run the bot, execute
-```
+```console
 node bot.js
 ```
-> The commands will be registered automatically
+The commands will be registered automatically.
 
 ## Roadmap dev
 - [x] An anonymous confession system. Members send a DM to the bot (`/confess <message>`), the admin approve it in a private channel (with a react) and the message will be then in the public channel) 
